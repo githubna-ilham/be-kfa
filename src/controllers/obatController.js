@@ -1,4 +1,4 @@
-const { Obat, KategoriObat, Satuan, GolonganObat, BentukSediaan } = require('../models');
+const { Obat, KategoriObat, Satuan, GolonganObat, BentukSediaan, Supplier } = require('../models');
 const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
 // Get all obat with pagination, search, and filters
@@ -43,6 +43,11 @@ const getAllObat = async (req, res) => {
           as: 'bentukSediaan',
           attributes: ['id', 'kode', 'nama'],
         },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: ['id', 'kode', 'nama', 'noTelp', 'email'],
+        },
       ],
     });
 
@@ -82,6 +87,11 @@ const getObatById = async (req, res) => {
           model: BentukSediaan,
           as: 'bentukSediaan',
           attributes: ['id', 'kode', 'nama'],
+        },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: ['id', 'kode', 'nama', 'noTelp', 'email'],
         },
       ],
     });
@@ -175,6 +185,11 @@ const createObat = async (req, res) => {
           as: 'bentukSediaan',
           attributes: ['id', 'kode', 'nama'],
         },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: ['id', 'kode', 'nama', 'noTelp', 'email'],
+        },
       ],
     });
 
@@ -263,6 +278,11 @@ const updateObat = async (req, res) => {
           model: BentukSediaan,
           as: 'bentukSediaan',
           attributes: ['id', 'kode', 'nama'],
+        },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: ['id', 'kode', 'nama', 'noTelp', 'email'],
         },
       ],
     });

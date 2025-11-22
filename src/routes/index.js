@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authRoutes = require('./authRoutes');
+const userRoutes = require('./userRoutes');
 const kategoriObatRoutes = require('./kategoriObatRoutes');
 const satuanRoutes = require('./satuanRoutes');
 const supplierRoutes = require('./supplierRoutes');
@@ -33,6 +34,7 @@ router.get('/', (req, res) => {
     description: 'RESTful API for KFA application',
     endpoints: {
       auth: '/api/auth',
+      users: '/api/users',
       health: '/api/health',
       // Master Data
       kategoriObat: '/api/kategori-obat',
@@ -58,6 +60,9 @@ router.get('/', (req, res) => {
 
 // Auth routes
 router.use('/auth', authRoutes);
+
+// User routes
+router.use('/users', userRoutes);
 
 // Master Data routes
 router.use('/kategori-obat', kategoriObatRoutes);
