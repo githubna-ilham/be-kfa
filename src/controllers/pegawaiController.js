@@ -13,12 +13,12 @@ const getAllPegawai = async (req, res) => {
         {
           model: Jabatan,
           as: 'jabatan',
-          attributes: ['id', 'nama_jabatan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: UnitKerja,
           as: 'unitKerja',
-          attributes: ['id', 'nama_unit'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
       order: [['id', 'ASC']],
@@ -51,12 +51,12 @@ const getPegawaiById = async (req, res) => {
         {
           model: Jabatan,
           as: 'jabatan',
-          attributes: ['id', 'nama_jabatan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: UnitKerja,
           as: 'unitKerja',
-          attributes: ['id', 'nama_unit'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
     });
@@ -134,12 +134,12 @@ const createPegawai = async (req, res) => {
         {
           model: Jabatan,
           as: 'jabatan',
-          attributes: ['id', 'nama_jabatan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: UnitKerja,
           as: 'unitKerja',
-          attributes: ['id', 'nama_unit'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
     });
@@ -214,12 +214,12 @@ const updatePegawai = async (req, res) => {
         {
           model: Jabatan,
           as: 'jabatan',
-          attributes: ['id', 'nama_jabatan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: UnitKerja,
           as: 'unitKerja',
-          attributes: ['id', 'nama_unit'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
     });

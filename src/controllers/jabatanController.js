@@ -50,18 +50,20 @@ const getJabatanById = async (req, res) => {
 // Create jabatan
 const createJabatan = async (req, res) => {
   try {
-    const { nama_jabatan, keterangan } = req.body;
+    const { kode, nama, deskripsi, isActive } = req.body;
 
-    if (!nama_jabatan) {
+    if (!kode || !nama) {
       return res.status(400).json({
         success: false,
-        message: 'Nama jabatan is required',
+        message: 'Kode and nama are required',
       });
     }
 
     const jabatan = await Jabatan.create({
-      nama_jabatan,
-      keterangan,
+      kode,
+      nama,
+      deskripsi,
+      isActive: isActive !== undefined ? isActive : true,
     });
 
     res.status(201).json({
@@ -83,7 +85,7 @@ const createJabatan = async (req, res) => {
 const updateJabatan = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama_jabatan, keterangan } = req.body;
+    const { kode, nama, deskripsi, isActive } = req.body;
 
     const jabatan = await Jabatan.findByPk(id);
 
@@ -95,8 +97,10 @@ const updateJabatan = async (req, res) => {
     }
 
     await jabatan.update({
-      nama_jabatan: nama_jabatan || jabatan.nama_jabatan,
-      keterangan: keterangan !== undefined ? keterangan : jabatan.keterangan,
+      kode: kode || jabatan.kode,
+      nama: nama || jabatan.nama,
+      deskripsi: deskripsi !== undefined ? deskripsi : jabatan.deskripsi,
+      isActive: isActive !== undefined ? isActive : jabatan.isActive,
     });
 
     res.json({

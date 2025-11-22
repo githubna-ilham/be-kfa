@@ -50,18 +50,20 @@ const getUnitKerjaById = async (req, res) => {
 // Create unit kerja
 const createUnitKerja = async (req, res) => {
   try {
-    const { nama_unit, keterangan } = req.body;
+    const { kode, nama, deskripsi, isActive } = req.body;
 
-    if (!nama_unit) {
+    if (!kode || !nama) {
       return res.status(400).json({
         success: false,
-        message: 'Nama unit is required',
+        message: 'Kode and nama are required',
       });
     }
 
     const unitKerja = await UnitKerja.create({
-      nama_unit,
-      keterangan,
+      kode,
+      nama,
+      deskripsi,
+      isActive: isActive !== undefined ? isActive : true,
     });
 
     res.status(201).json({
@@ -83,7 +85,7 @@ const createUnitKerja = async (req, res) => {
 const updateUnitKerja = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama_unit, keterangan } = req.body;
+    const { kode, nama, deskripsi, isActive } = req.body;
 
     const unitKerja = await UnitKerja.findByPk(id);
 
@@ -95,8 +97,10 @@ const updateUnitKerja = async (req, res) => {
     }
 
     await unitKerja.update({
-      nama_unit: nama_unit || unitKerja.nama_unit,
-      keterangan: keterangan !== undefined ? keterangan : unitKerja.keterangan,
+      kode: kode || unitKerja.kode,
+      nama: nama || unitKerja.nama,
+      deskripsi: deskripsi !== undefined ? deskripsi : unitKerja.deskripsi,
+      isActive: isActive !== undefined ? isActive : unitKerja.isActive,
     });
 
     res.json({
