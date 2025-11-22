@@ -1,4 +1,4 @@
-const { RiwayatStok, Obat, Pegawai, User } = require('../models');
+const { RiwayatStok, Obat, Pegawai, User, Satuan } = require('../models');
 const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
 // Get all riwayat stok with pagination, search, and filters
@@ -25,7 +25,14 @@ const getAllRiwayatStok = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kodeObat', 'namaObat', 'satuan'],
+          attributes: ['id', 'kodeObat', 'namaObat'],
+          include: [
+            {
+              model: Satuan,
+              as: 'satuan',
+              attributes: ['id', 'nama', 'simbol'],
+            },
+          ],
         },
         {
           model: Pegawai,
@@ -63,7 +70,14 @@ const getRiwayatStokById = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kodeObat', 'namaObat', 'satuan'],
+          attributes: ['id', 'kodeObat', 'namaObat'],
+          include: [
+            {
+              model: Satuan,
+              as: 'satuan',
+              attributes: ['id', 'nama', 'simbol'],
+            },
+          ],
         },
         {
           model: Pegawai,
@@ -155,7 +169,14 @@ const createRiwayatStok = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kodeObat', 'namaObat', 'satuan'],
+          attributes: ['id', 'kodeObat', 'namaObat'],
+          include: [
+            {
+              model: Satuan,
+              as: 'satuan',
+              attributes: ['id', 'nama', 'simbol'],
+            },
+          ],
         },
         {
           model: Pegawai,
