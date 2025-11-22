@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "bootcamp-react",
+    "database": "bootcamp_react",
+    "host": "145.79.15.116",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "bootcamp-react",
+    "database": "bootcamp_react_test",
+    "host": "145.79.15.116",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "bootcamp-react",
+    "database": "bootcamp_react",
+    "host": "145.79.15.116",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}
