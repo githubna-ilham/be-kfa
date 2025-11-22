@@ -30,7 +30,7 @@ const getAllRiwayatStok = async (req, res) => {
             {
               model: Satuan,
               as: 'satuan',
-              attributes: ['id', 'nama', 'simbol'],
+              attributes: ['id', 'kode', 'nama'],
             },
           ],
         },
@@ -75,7 +75,7 @@ const getRiwayatStokById = async (req, res) => {
             {
               model: Satuan,
               as: 'satuan',
-              attributes: ['id', 'nama', 'simbol'],
+              attributes: ['id', 'kode', 'nama'],
             },
           ],
         },
@@ -174,7 +174,7 @@ const createRiwayatStok = async (req, res) => {
             {
               model: Satuan,
               as: 'satuan',
-              attributes: ['id', 'nama', 'simbol'],
+              attributes: ['id', 'kode', 'nama'],
             },
           ],
         },
