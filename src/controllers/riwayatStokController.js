@@ -1,35 +1,49 @@
-const { RiwayatStok, Obat, User } = require('../models');
+const { RiwayatStok, Obat, Pegawai, User } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all riwayat stok
+// Get all riwayat stok with pagination, search, and filters
 const getAllRiwayatStok = async (req, res) => {
   try {
-    const { obat_id } = req.query;
-    const where = {};
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['keterangan'],
+      allowedFilters: ['obatId', 'jenisMutasi', 'referensiTipe', 'createdBy'],
+      defaultSort: 'tanggalMutasi',
+      dateFields: ['tanggalMutasi'],
+    });
 
-    if (obat_id) {
-      where.obat_id = obat_id;
+    // Override default sort to DESC for riwayat stok
+    if (!req.query.sortOrder) {
+      queryOptions.order = [['tanggalMutasi', 'DESC']];
     }
 
-    const riwayatStok = await RiwayatStok.findAll({
-      where,
+    const { count, rows } = await RiwayatStok.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
       include: [
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kodeObat', 'namaObat'],
+          attributes: ['id', 'kodeObat', 'namaObat', 'satuan'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          required: false, // LEFT JOIN - riwayat tanpa pegawai juga ditampilkan
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
       ],
-      order: [['tanggal', 'DESC']],
     });
-    res.json({
-      success: true,
-      data: riwayatStok,
-    });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting riwayat stok:', error);
     res.status(500).json({
@@ -49,12 +63,20 @@ const getRiwayatStokById = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kodeObat', 'namaObat'],
+          attributes: ['id', 'kodeObat', 'namaObat', 'satuan'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          required: false,
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
       ],
     });
@@ -84,34 +106,48 @@ const getRiwayatStokById = async (req, res) => {
 const createRiwayatStok = async (req, res) => {
   try {
     const {
-      obat_id,
-      jenis_transaksi,
-      jumlah,
-      stok_sebelum,
-      stok_sesudah,
-      referensi_id,
-      user_id,
-      tanggal,
+      obatId,
+      jenisMutasi,
+      qtyMasuk,
+      qtyKeluar,
+      stokSebelum,
+      stokSesudah,
+      referensiTipe,
+      referensiId,
+      tanggalMutasi,
       keterangan,
     } = req.body;
 
-    if (!obat_id || !jenis_transaksi || !jumlah) {
+    if (!obatId || !jenisMutasi) {
       return res.status(400).json({
         success: false,
-        message: 'Obat ID, jenis transaksi, and jumlah are required',
+        message: 'Obat ID and jenis mutasi are required',
       });
     }
 
+    // Get createdBy from logged-in user's pegawai data
+    let createdBy = null;
+    if (req.user) {
+      const pegawai = await Pegawai.findOne({
+        where: { userId: req.user.id },
+      });
+      if (pegawai) {
+        createdBy = pegawai.id;
+      }
+    }
+
     const riwayatStok = await RiwayatStok.create({
-      obat_id,
-      jenis_transaksi,
-      jumlah,
-      stok_sebelum: stok_sebelum || 0,
-      stok_sesudah: stok_sesudah || 0,
-      referensi_id,
-      user_id,
-      tanggal: tanggal || new Date(),
+      obatId,
+      jenisMutasi,
+      qtyMasuk: qtyMasuk || 0,
+      qtyKeluar: qtyKeluar || 0,
+      stokSebelum: stokSebelum || 0,
+      stokSesudah: stokSesudah || 0,
+      referensiTipe,
+      referensiId,
+      tanggalMutasi: tanggalMutasi || new Date(),
       keterangan,
+      createdBy,
     });
 
     const riwayatStokWithRelations = await RiwayatStok.findByPk(riwayatStok.id, {
@@ -119,12 +155,20 @@ const createRiwayatStok = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kodeObat', 'namaObat'],
+          attributes: ['id', 'kodeObat', 'namaObat', 'satuan'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          required: false,
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
       ],
     });

@@ -169,7 +169,10 @@ const createPembelianObat = async (req, res) => {
     // Calculate totalHarga from details
     let calculatedTotalHarga = 0;
     for (const detail of pembelianDetails) {
-      const subtotal = detail.subtotal || (detail.hargaSatuan * detail.jumlah);
+      // Support both hargaBeli/hargaSatuan and qty/jumlah
+      const harga = detail.hargaBeli || detail.hargaSatuan || 0;
+      const quantity = detail.qty || detail.jumlah || 0;
+      const subtotal = detail.subtotal || (harga * quantity);
       calculatedTotalHarga += subtotal;
     }
 
@@ -198,29 +201,34 @@ const createPembelianObat = async (req, res) => {
 
     // Create detail pembelian and update stok
     const detailPromises = pembelianDetails.map(async (detail) => {
-      // Update stok obat
+      // Support both naming conventions
+      const harga = detail.hargaBeli || detail.hargaSatuan || 0;
+      const quantity = detail.qty || detail.jumlah || 0;
+
+      // Validate obat exists
       const obat = await Obat.findByPk(detail.obatId, { transaction: t });
       if (!obat) {
         throw new Error(`Obat with ID ${detail.obatId} not found`);
       }
 
+      // Note: Stok akan diupdate otomatis oleh hook afterCreate di model DetailPembelianObat
+      // Tapi kita tetap update hargaBeli di master obat
       await obat.update(
         {
-          stok: obat.stok + detail.jumlah,
-          hargaBeli: detail.hargaSatuan, // Update harga beli terakhir
+          hargaBeli: harga, // Update harga beli terakhir
         },
         { transaction: t }
       );
 
       // Calculate subtotal if not provided
-      const calculatedSubtotal = detail.subtotal || (detail.hargaSatuan * detail.jumlah);
+      const calculatedSubtotal = detail.subtotal || (harga * quantity);
 
       return DetailPembelianObat.create(
         {
           pembelianObatId: pembelianObat.id,
           obatId: detail.obatId,
-          jumlah: detail.jumlah,
-          hargaSatuan: detail.hargaSatuan,
+          qty: quantity,
+          hargaBeli: harga,
           subtotal: calculatedSubtotal,
           tanggalKadaluarsa: detail.tanggalKadaluarsa,
           noBatch: detail.noBatch,
@@ -381,16 +389,8 @@ const deletePembelianObat = async (req, res) => {
       });
     }
 
-    // Restore stok (kurangi stok karena pembelian dibatalkan)
-    for (const detail of pembelianObat.details) {
-      const obat = await Obat.findByPk(detail.obatId, { transaction: t });
-      if (obat) {
-        await obat.update(
-          { stok: obat.stok - detail.jumlah },
-          { transaction: t }
-        );
-      }
-    }
+    // Note: Stok akan dikembalikan otomatis oleh hook beforeDestroy di model DetailPembelianObat
+    // Tidak perlu manual update stok di sini
 
     // Delete detail first
     await DetailPembelianObat.destroy({
