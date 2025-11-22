@@ -9,7 +9,7 @@ const getAllTransaksi = async (req, res) => {
         {
           model: Customer,
           as: 'customer',
-          attributes: ['id', 'nama_customer', 'telepon'],
+          attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
           model: User,
@@ -23,7 +23,7 @@ const getAllTransaksi = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat'],
+              attributes: ['id', 'kodeObat', 'namaObat'],
             },
           ],
         },
@@ -53,7 +53,7 @@ const getTransaksiById = async (req, res) => {
         {
           model: Customer,
           as: 'customer',
-          attributes: ['id', 'nama_customer', 'telepon', 'alamat'],
+          attributes: ['id', 'kode', 'nama', 'noTelp', 'alamat'],
         },
         {
           model: User,
@@ -67,7 +67,7 @@ const getTransaksiById = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat', 'harga_jual'],
+              attributes: ['id', 'kodeObat', 'namaObat', 'hargaJual'],
             },
           ],
         },
@@ -182,7 +182,7 @@ const createTransaksi = async (req, res) => {
         {
           model: Customer,
           as: 'customer',
-          attributes: ['id', 'nama_customer', 'telepon'],
+          attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
           model: User,
@@ -196,7 +196,7 @@ const createTransaksi = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat'],
+              attributes: ['id', 'kodeObat', 'namaObat'],
             },
           ],
         },
@@ -251,7 +251,7 @@ const updateTransaksi = async (req, res) => {
         {
           model: Customer,
           as: 'customer',
-          attributes: ['id', 'nama_customer', 'telepon'],
+          attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
           model: User,
@@ -265,7 +265,7 @@ const updateTransaksi = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat'],
+              attributes: ['id', 'kodeObat', 'namaObat'],
             },
           ],
         },

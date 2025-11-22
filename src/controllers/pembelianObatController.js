@@ -9,7 +9,7 @@ const getAllPembelianObat = async (req, res) => {
         {
           model: Supplier,
           as: 'supplier',
-          attributes: ['id', 'nama_supplier', 'telepon'],
+          attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
           model: User,
@@ -23,7 +23,7 @@ const getAllPembelianObat = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat'],
+              attributes: ['id', 'kodeObat', 'namaObat'],
             },
           ],
         },
@@ -53,7 +53,7 @@ const getPembelianObatById = async (req, res) => {
         {
           model: Supplier,
           as: 'supplier',
-          attributes: ['id', 'nama_supplier', 'telepon', 'alamat'],
+          attributes: ['id', 'kode', 'nama', 'noTelp', 'alamat'],
         },
         {
           model: User,
@@ -67,7 +67,7 @@ const getPembelianObatById = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat', 'harga_beli'],
+              attributes: ['id', 'kodeObat', 'namaObat', 'hargaBeli'],
             },
           ],
         },
@@ -151,7 +151,7 @@ const createPembelianObat = async (req, res) => {
       await obat.update(
         {
           stok: obat.stok + detail.jumlah,
-          harga_beli: detail.harga_satuan, // Update harga beli terakhir
+          hargaBeli: detail.harga_satuan, // Update harga beli terakhir
         },
         { transaction: t }
       );
@@ -180,7 +180,7 @@ const createPembelianObat = async (req, res) => {
         {
           model: Supplier,
           as: 'supplier',
-          attributes: ['id', 'nama_supplier', 'telepon'],
+          attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
           model: User,
@@ -194,7 +194,7 @@ const createPembelianObat = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat'],
+              attributes: ['id', 'kodeObat', 'namaObat'],
             },
           ],
         },
@@ -249,7 +249,7 @@ const updatePembelianObat = async (req, res) => {
         {
           model: Supplier,
           as: 'supplier',
-          attributes: ['id', 'nama_supplier', 'telepon'],
+          attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
           model: User,
@@ -263,7 +263,7 @@ const updatePembelianObat = async (req, res) => {
             {
               model: Obat,
               as: 'obat',
-              attributes: ['id', 'kode_obat', 'nama_obat'],
+              attributes: ['id', 'kodeObat', 'namaObat'],
             },
           ],
         },

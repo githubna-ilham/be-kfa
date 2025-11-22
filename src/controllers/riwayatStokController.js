@@ -16,7 +16,7 @@ const getAllRiwayatStok = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kode_obat', 'nama_obat'],
+          attributes: ['id', 'kodeObat', 'namaObat'],
         },
         {
           model: User,
@@ -49,7 +49,7 @@ const getRiwayatStokById = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kode_obat', 'nama_obat'],
+          attributes: ['id', 'kodeObat', 'namaObat'],
         },
         {
           model: User,
@@ -119,7 +119,7 @@ const createRiwayatStok = async (req, res) => {
         {
           model: Obat,
           as: 'obat',
-          attributes: ['id', 'kode_obat', 'nama_obat'],
+          attributes: ['id', 'kodeObat', 'namaObat'],
         },
         {
           model: User,

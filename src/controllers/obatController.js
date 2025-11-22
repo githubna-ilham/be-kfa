@@ -7,23 +7,23 @@ const getAllObat = async (req, res) => {
       include: [
         {
           model: KategoriObat,
-          as: 'kategori',
-          attributes: ['id', 'nama_kategori'],
+          as: 'kategoriObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: Satuan,
           as: 'satuan',
-          attributes: ['id', 'nama_satuan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: GolonganObat,
-          as: 'golongan',
-          attributes: ['id', 'nama_golongan'],
+          as: 'golonganObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: BentukSediaan,
           as: 'bentukSediaan',
-          attributes: ['id', 'nama_bentuk'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
       order: [['id', 'ASC']],
@@ -50,23 +50,23 @@ const getObatById = async (req, res) => {
       include: [
         {
           model: KategoriObat,
-          as: 'kategori',
-          attributes: ['id', 'nama_kategori'],
+          as: 'kategoriObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: Satuan,
           as: 'satuan',
-          attributes: ['id', 'nama_satuan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: GolonganObat,
-          as: 'golongan',
-          attributes: ['id', 'nama_golongan'],
+          as: 'golonganObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: BentukSediaan,
           as: 'bentukSediaan',
-          attributes: ['id', 'nama_bentuk'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
     });
@@ -96,63 +96,69 @@ const getObatById = async (req, res) => {
 const createObat = async (req, res) => {
   try {
     const {
-      kode_obat,
-      nama_obat,
-      kategori_id,
-      satuan_id,
-      golongan_id,
-      bentuk_sediaan_id,
-      harga_beli,
-      harga_jual,
+      kodeObat,
+      namaObat,
+      kategoriObatId,
+      satuanId,
+      golonganObatId,
+      bentukSediaanId,
+      supplierId,
+      hargaBeli,
+      hargaJual,
       stok,
-      stok_minimum,
-      tanggal_kadaluarsa,
+      stokMinimal,
+      tanggalKadaluarsa,
+      noBatch,
       deskripsi,
+      isActive,
     } = req.body;
 
-    if (!kode_obat || !nama_obat || !kategori_id || !satuan_id) {
+    if (!kodeObat || !namaObat || !kategoriObatId || !satuanId) {
       return res.status(400).json({
         success: false,
-        message: 'Kode obat, nama obat, kategori_id, and satuan_id are required',
+        message: 'kodeObat, namaObat, kategoriObatId, and satuanId are required',
       });
     }
 
     const obat = await Obat.create({
-      kode_obat,
-      nama_obat,
-      kategori_id,
-      satuan_id,
-      golongan_id,
-      bentuk_sediaan_id,
-      harga_beli: harga_beli || 0,
-      harga_jual: harga_jual || 0,
+      kodeObat,
+      namaObat,
+      kategoriObatId,
+      satuanId,
+      golonganObatId,
+      bentukSediaanId,
+      supplierId,
+      hargaBeli: hargaBeli || 0,
+      hargaJual: hargaJual || 0,
       stok: stok || 0,
-      stok_minimum: stok_minimum || 0,
-      tanggal_kadaluarsa,
+      stokMinimal: stokMinimal || 10,
+      tanggalKadaluarsa,
+      noBatch,
       deskripsi,
+      isActive: isActive !== undefined ? isActive : true,
     });
 
     const obatWithRelations = await Obat.findByPk(obat.id, {
       include: [
         {
           model: KategoriObat,
-          as: 'kategori',
-          attributes: ['id', 'nama_kategori'],
+          as: 'kategoriObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: Satuan,
           as: 'satuan',
-          attributes: ['id', 'nama_satuan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: GolonganObat,
-          as: 'golongan',
-          attributes: ['id', 'nama_golongan'],
+          as: 'golonganObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: BentukSediaan,
           as: 'bentukSediaan',
-          attributes: ['id', 'nama_bentuk'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
     });
@@ -177,18 +183,21 @@ const updateObat = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      kode_obat,
-      nama_obat,
-      kategori_id,
-      satuan_id,
-      golongan_id,
-      bentuk_sediaan_id,
-      harga_beli,
-      harga_jual,
+      kodeObat,
+      namaObat,
+      kategoriObatId,
+      satuanId,
+      golonganObatId,
+      bentukSediaanId,
+      supplierId,
+      hargaBeli,
+      hargaJual,
       stok,
-      stok_minimum,
-      tanggal_kadaluarsa,
+      stokMinimal,
+      tanggalKadaluarsa,
+      noBatch,
       deskripsi,
+      isActive,
     } = req.body;
 
     const obat = await Obat.findByPk(id);
@@ -201,41 +210,44 @@ const updateObat = async (req, res) => {
     }
 
     await obat.update({
-      kode_obat: kode_obat || obat.kode_obat,
-      nama_obat: nama_obat || obat.nama_obat,
-      kategori_id: kategori_id || obat.kategori_id,
-      satuan_id: satuan_id || obat.satuan_id,
-      golongan_id: golongan_id !== undefined ? golongan_id : obat.golongan_id,
-      bentuk_sediaan_id: bentuk_sediaan_id !== undefined ? bentuk_sediaan_id : obat.bentuk_sediaan_id,
-      harga_beli: harga_beli !== undefined ? harga_beli : obat.harga_beli,
-      harga_jual: harga_jual !== undefined ? harga_jual : obat.harga_jual,
+      kodeObat: kodeObat || obat.kodeObat,
+      namaObat: namaObat || obat.namaObat,
+      kategoriObatId: kategoriObatId !== undefined ? kategoriObatId : obat.kategoriObatId,
+      satuanId: satuanId !== undefined ? satuanId : obat.satuanId,
+      golonganObatId: golonganObatId !== undefined ? golonganObatId : obat.golonganObatId,
+      bentukSediaanId: bentukSediaanId !== undefined ? bentukSediaanId : obat.bentukSediaanId,
+      supplierId: supplierId !== undefined ? supplierId : obat.supplierId,
+      hargaBeli: hargaBeli !== undefined ? hargaBeli : obat.hargaBeli,
+      hargaJual: hargaJual !== undefined ? hargaJual : obat.hargaJual,
       stok: stok !== undefined ? stok : obat.stok,
-      stok_minimum: stok_minimum !== undefined ? stok_minimum : obat.stok_minimum,
-      tanggal_kadaluarsa: tanggal_kadaluarsa !== undefined ? tanggal_kadaluarsa : obat.tanggal_kadaluarsa,
+      stokMinimal: stokMinimal !== undefined ? stokMinimal : obat.stokMinimal,
+      tanggalKadaluarsa: tanggalKadaluarsa !== undefined ? tanggalKadaluarsa : obat.tanggalKadaluarsa,
+      noBatch: noBatch !== undefined ? noBatch : obat.noBatch,
       deskripsi: deskripsi !== undefined ? deskripsi : obat.deskripsi,
+      isActive: isActive !== undefined ? isActive : obat.isActive,
     });
 
     const obatWithRelations = await Obat.findByPk(id, {
       include: [
         {
           model: KategoriObat,
-          as: 'kategori',
-          attributes: ['id', 'nama_kategori'],
+          as: 'kategoriObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: Satuan,
           as: 'satuan',
-          attributes: ['id', 'nama_satuan'],
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: GolonganObat,
-          as: 'golongan',
-          attributes: ['id', 'nama_golongan'],
+          as: 'golonganObat',
+          attributes: ['id', 'kode', 'nama'],
         },
         {
           model: BentukSediaan,
           as: 'bentukSediaan',
-          attributes: ['id', 'nama_bentuk'],
+          attributes: ['id', 'kode', 'nama'],
         },
       ],
     });
