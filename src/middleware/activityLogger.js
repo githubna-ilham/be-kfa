@@ -52,13 +52,12 @@ const activityLogger = async (req, res, next) => {
 
   const startTime = Date.now();
 
-  // Capture request information
+  // Capture request information (without user_id yet)
   const logData = {
     method: req.method,
     endpoint: req.originalUrl || req.url,
     ip_address: getClientIp(req),
     user_agent: req.headers['user-agent'],
-    user_id: req.user?.id || null,
     action: getActionDescription(req.method, req.path),
     request_body: sanitizeRequestBody(req.body, req.method),
     query_params: Object.keys(req.query).length > 0 ? req.query : null,
@@ -75,8 +74,10 @@ const activityLogger = async (req, res, next) => {
       const responseTime = Date.now() - startTime;
 
       // Save log to database asynchronously
+      // Get user_id at response time (after authenticate middleware has run)
       ActivityLog.create({
         ...logData,
+        user_id: req.user?.id || null,
         response_status: res.statusCode,
         response_time: responseTime,
         error_message: res.statusCode >= 400 && data?.error ? data.error : null,
@@ -95,8 +96,10 @@ const activityLogger = async (req, res, next) => {
       responseLogged = true;
       const responseTime = Date.now() - startTime;
 
+      // Get user_id at response time (after authenticate middleware has run)
       ActivityLog.create({
         ...logData,
+        user_id: req.user?.id || null,
         response_status: res.statusCode,
         response_time: responseTime,
       }).catch((error) => {
