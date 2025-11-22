@@ -183,6 +183,18 @@ const createTransaksi = async (req, res) => {
     // Generate noFaktur if not provided
     const generatedNoFaktur = noFaktur || `TRX-${Date.now()}`;
 
+    // Normalize metodePembayaran (capitalize first letter)
+    const normalizeMetodePembayaran = (metode) => {
+      if (!metode) return 'Cash';
+      const normalized = metode.charAt(0).toUpperCase() + metode.slice(1).toLowerCase();
+      // Valid values: Cash, Transfer, Debit, Kredit, QRIS
+      const validMethods = ['Cash', 'Transfer', 'Debit', 'Kredit', 'Qris'];
+      if (validMethods.includes(normalized)) {
+        return normalized === 'Qris' ? 'QRIS' : normalized;
+      }
+      return 'Cash'; // Default fallback
+    };
+
     // Create transaksi
     const transaksi = await Transaksi.create(
       {
@@ -193,7 +205,7 @@ const createTransaksi = async (req, res) => {
         totalHarga: calculatedTotalHarga,
         diskon: finalDiskon,
         grandTotal: calculatedGrandTotal,
-        metodePembayaran: metodePembayaran || 'Cash',
+        metodePembayaran: normalizeMetodePembayaran(metodePembayaran),
         status: status || 'pending',
         keterangan,
       },
@@ -306,10 +318,24 @@ const updateTransaksi = async (req, res) => {
       });
     }
 
+    // Normalize metodePembayaran (capitalize first letter)
+    const normalizeMetodePembayaran = (metode) => {
+      if (!metode) return null;
+      const normalized = metode.charAt(0).toUpperCase() + metode.slice(1).toLowerCase();
+      // Valid values: Cash, Transfer, Debit, Kredit, QRIS
+      const validMethods = ['Cash', 'Transfer', 'Debit', 'Kredit', 'Qris'];
+      if (validMethods.includes(normalized)) {
+        return normalized === 'Qris' ? 'QRIS' : normalized;
+      }
+      return null;
+    };
+
     await transaksi.update({
       customerId: customerId !== undefined ? customerId : transaksi.customerId,
       status: status || transaksi.status,
-      metodePembayaran: metodePembayaran !== undefined ? metodePembayaran : transaksi.metodePembayaran,
+      metodePembayaran: metodePembayaran !== undefined
+        ? normalizeMetodePembayaran(metodePembayaran) || transaksi.metodePembayaran
+        : transaksi.metodePembayaran,
       keterangan: keterangan !== undefined ? keterangan : transaksi.keterangan,
     });
 
