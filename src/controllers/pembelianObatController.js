@@ -1,10 +1,27 @@
-const { PembelianObat, DetailPembelianObat, Supplier, Obat, User } = require('../models');
+const { PembelianObat, DetailPembelianObat, Supplier, Obat, Pegawai, User } = require('../models');
 const { sequelize } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all pembelian obat
+// Get all pembelian obat with pagination, search, and filters
 const getAllPembelianObat = async (req, res) => {
   try {
-    const pembelianObat = await PembelianObat.findAll({
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['noFaktur', 'keterangan'],
+      allowedFilters: ['supplierId', 'pegawaiId', 'status'],
+      defaultSort: 'tanggalPembelian',
+      dateFields: ['tanggalPembelian'],
+    });
+
+    // Override default sort to DESC for pembelian
+    if (!req.query.sortOrder) {
+      queryOptions.order = [['tanggalPembelian', 'DESC']];
+    }
+
+    const { count, rows } = await PembelianObat.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
       include: [
         {
           model: Supplier,
@@ -12,13 +29,20 @@ const getAllPembelianObat = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailPembelianObat,
-          as: 'detailPembelian',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -28,12 +52,9 @@ const getAllPembelianObat = async (req, res) => {
           ],
         },
       ],
-      order: [['tanggal_pembelian', 'DESC']],
     });
-    res.json({
-      success: true,
-      data: pembelianObat,
-    });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting pembelian obat:', error);
     res.status(500).json({
@@ -56,13 +77,20 @@ const getPembelianObatById = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp', 'alamat'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email', 'noTelp'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailPembelianObat,
-          as: 'detailPembelian',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -101,70 +129,101 @@ const createPembelianObat = async (req, res) => {
 
   try {
     const {
-      supplier_id,
-      user_id,
-      tanggal_pembelian,
-      nomor_faktur,
-      total_harga,
+      noFaktur,
+      supplierId,
+      pegawaiId,
+      tanggalPembelian,
       diskon,
-      pajak,
-      total_bayar,
-      status_pembayaran,
-      jatuh_tempo,
-      catatan,
-      detail_pembelian,
+      status,
+      keterangan,
+      details,
+      detailPembelian, // Support both naming
     } = req.body;
 
-    if (!supplier_id || !user_id || !detail_pembelian || detail_pembelian.length === 0) {
+    // Use detailPembelian if details is not provided
+    const pembelianDetails = details || detailPembelian;
+
+    if (!supplierId || !pembelianDetails || pembelianDetails.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Supplier ID, User ID, and detail pembelian are required',
+        message: 'Supplier ID and detail pembelian are required',
       });
     }
+
+    // Get pegawaiId from logged-in user if not provided
+    let finalPegawaiId = pegawaiId;
+    if (!finalPegawaiId) {
+      const pegawai = await Pegawai.findOne({
+        where: { userId: req.user.id },
+      });
+
+      if (!pegawai) {
+        return res.status(400).json({
+          success: false,
+          message: 'Pegawai data not found for current user. Please provide pegawaiId.',
+        });
+      }
+      finalPegawaiId = pegawai.id;
+    }
+
+    // Calculate totalHarga from details
+    let calculatedTotalHarga = 0;
+    for (const detail of pembelianDetails) {
+      const subtotal = detail.subtotal || (detail.hargaSatuan * detail.jumlah);
+      calculatedTotalHarga += subtotal;
+    }
+
+    // Calculate grandTotal (totalHarga - diskon)
+    const finalDiskon = diskon || 0;
+    const calculatedGrandTotal = calculatedTotalHarga - finalDiskon;
+
+    // Generate noFaktur if not provided
+    const generatedNoFaktur = noFaktur || `PO-${Date.now()}`;
 
     // Create pembelian obat
     const pembelianObat = await PembelianObat.create(
       {
-        supplier_id,
-        user_id,
-        tanggal_pembelian: tanggal_pembelian || new Date(),
-        nomor_faktur,
-        total_harga: total_harga || 0,
-        diskon: diskon || 0,
-        pajak: pajak || 0,
-        total_bayar: total_bayar || 0,
-        status_pembayaran: status_pembayaran || 'belum_lunas',
-        jatuh_tempo,
-        catatan,
+        noFaktur: generatedNoFaktur,
+        supplierId,
+        pegawaiId: finalPegawaiId,
+        tanggalPembelian: tanggalPembelian || new Date(),
+        totalHarga: calculatedTotalHarga,
+        diskon: finalDiskon,
+        grandTotal: calculatedGrandTotal,
+        status: status || 'pending',
+        keterangan,
       },
       { transaction: t }
     );
 
     // Create detail pembelian and update stok
-    const detailPromises = detail_pembelian.map(async (detail) => {
+    const detailPromises = pembelianDetails.map(async (detail) => {
       // Update stok obat
-      const obat = await Obat.findByPk(detail.obat_id, { transaction: t });
+      const obat = await Obat.findByPk(detail.obatId, { transaction: t });
       if (!obat) {
-        throw new Error(`Obat with ID ${detail.obat_id} not found`);
+        throw new Error(`Obat with ID ${detail.obatId} not found`);
       }
 
       await obat.update(
         {
           stok: obat.stok + detail.jumlah,
-          hargaBeli: detail.harga_satuan, // Update harga beli terakhir
+          hargaBeli: detail.hargaSatuan, // Update harga beli terakhir
         },
         { transaction: t }
       );
 
+      // Calculate subtotal if not provided
+      const calculatedSubtotal = detail.subtotal || (detail.hargaSatuan * detail.jumlah);
+
       return DetailPembelianObat.create(
         {
-          pembelian_id: pembelianObat.id,
-          obat_id: detail.obat_id,
+          pembelianObatId: pembelianObat.id,
+          obatId: detail.obatId,
           jumlah: detail.jumlah,
-          harga_satuan: detail.harga_satuan,
-          subtotal: detail.subtotal,
-          tanggal_kadaluarsa: detail.tanggal_kadaluarsa,
-          batch_number: detail.batch_number,
+          hargaSatuan: detail.hargaSatuan,
+          subtotal: calculatedSubtotal,
+          tanggalKadaluarsa: detail.tanggalKadaluarsa,
+          noBatch: detail.noBatch,
         },
         { transaction: t }
       );
@@ -183,13 +242,20 @@ const createPembelianObat = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailPembelianObat,
-          as: 'detailPembelian',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -222,10 +288,9 @@ const updatePembelianObat = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      supplier_id,
-      status_pembayaran,
-      jatuh_tempo,
-      catatan,
+      supplierId,
+      status,
+      keterangan,
     } = req.body;
 
     const pembelianObat = await PembelianObat.findByPk(id);
@@ -238,10 +303,9 @@ const updatePembelianObat = async (req, res) => {
     }
 
     await pembelianObat.update({
-      supplier_id: supplier_id || pembelianObat.supplier_id,
-      status_pembayaran: status_pembayaran || pembelianObat.status_pembayaran,
-      jatuh_tempo: jatuh_tempo !== undefined ? jatuh_tempo : pembelianObat.jatuh_tempo,
-      catatan: catatan !== undefined ? catatan : pembelianObat.catatan,
+      supplierId: supplierId !== undefined ? supplierId : pembelianObat.supplierId,
+      status: status || pembelianObat.status,
+      keterangan: keterangan !== undefined ? keterangan : pembelianObat.keterangan,
     });
 
     const pembelianWithRelations = await PembelianObat.findByPk(id, {
@@ -252,13 +316,20 @@ const updatePembelianObat = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailPembelianObat,
-          as: 'detailPembelian',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -296,7 +367,7 @@ const deletePembelianObat = async (req, res) => {
       include: [
         {
           model: DetailPembelianObat,
-          as: 'detailPembelian',
+          as: 'details',
         },
       ],
       transaction: t,
@@ -310,9 +381,9 @@ const deletePembelianObat = async (req, res) => {
       });
     }
 
-    // Restore stok
-    for (const detail of pembelianObat.detailPembelian) {
-      const obat = await Obat.findByPk(detail.obat_id, { transaction: t });
+    // Restore stok (kurangi stok karena pembelian dibatalkan)
+    for (const detail of pembelianObat.details) {
+      const obat = await Obat.findByPk(detail.obatId, { transaction: t });
       if (obat) {
         await obat.update(
           { stok: obat.stok - detail.jumlah },
@@ -323,7 +394,7 @@ const deletePembelianObat = async (req, res) => {
 
     // Delete detail first
     await DetailPembelianObat.destroy({
-      where: { pembelian_id: id },
+      where: { pembelianObatId: id },
       transaction: t,
     });
 
