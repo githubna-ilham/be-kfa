@@ -248,6 +248,50 @@
 					"response": []
 				},
 				{
+					"name": "Get All Kategori Obat with Pagination & Search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/kategori-obat?page=1&limit=10&search=obat&sortBy=nama&sortOrder=ASC&isActive=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kategori-obat"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": "obat"
+								},
+								{
+									"key": "sortBy",
+									"value": "nama"
+								},
+								{
+									"key": "sortOrder",
+									"value": "ASC"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Kategori Obat by ID",
 					"request": {
 						"method": "GET",
@@ -1060,6 +1104,67 @@
 					"response": []
 				},
 				{
+					"name": "Get All Pegawai with Search & Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pegawai?page=1&limit=10&search=admin&jabatanId=1&unitKerjaId=1&status=aktif&jenisKelamin=L&sortBy=nama&sortOrder=ASC",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pegawai"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": "admin",
+									"description": "Search in: nip, nama, email, noTelp"
+								},
+								{
+									"key": "jabatanId",
+									"value": "1",
+									"description": "Filter by jabatan"
+								},
+								{
+									"key": "unitKerjaId",
+									"value": "1",
+									"description": "Filter by unit kerja"
+								},
+								{
+									"key": "status",
+									"value": "aktif",
+									"description": "aktif or non-aktif"
+								},
+								{
+									"key": "jenisKelamin",
+									"value": "L",
+									"description": "L or P"
+								},
+								{
+									"key": "sortBy",
+									"value": "nama"
+								},
+								{
+									"key": "sortOrder",
+									"value": "ASC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Pegawai by ID",
 					"request": {
 						"method": "GET",
@@ -1170,6 +1275,56 @@
 							"path": [
 								"api",
 								"customer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Customers with Search & Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/customer?page=1&limit=20&search=budi&jenisKelamin=L&isActive=true&sortBy=nama&sortOrder=ASC",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customer"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "search",
+									"value": "budi",
+									"description": "Search in: kode, nama, email, noTelp, alamat"
+								},
+								{
+									"key": "jenisKelamin",
+									"value": "L",
+									"description": "L or P"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "sortBy",
+									"value": "nama"
+								},
+								{
+									"key": "sortOrder",
+									"value": "ASC"
+								}
 							]
 						}
 					},
@@ -1292,6 +1447,71 @@
 					"response": []
 				},
 				{
+					"name": "Get All Obat with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/obat?page=1&limit=20&search=paracetamol&kategoriObatId=3&satuanId=1&golonganObatId=2&isActive=true&sortBy=namaObat&sortOrder=ASC",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"obat"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Nomor halaman"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Data per halaman"
+								},
+								{
+									"key": "search",
+									"value": "paracetamol",
+									"description": "Search in: kodeObat, namaObat, deskripsi"
+								},
+								{
+									"key": "kategoriObatId",
+									"value": "3",
+									"description": "Filter by kategori obat"
+								},
+								{
+									"key": "satuanId",
+									"value": "1",
+									"description": "Filter by satuan"
+								},
+								{
+									"key": "golonganObatId",
+									"value": "2",
+									"description": "Filter by golongan obat"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"description": "Filter by status"
+								},
+								{
+									"key": "sortBy",
+									"value": "namaObat",
+									"description": "Sort by field"
+								},
+								{
+									"key": "sortOrder",
+									"value": "ASC",
+									"description": "ASC or DESC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Obat by ID",
 					"request": {
 						"method": "GET",
@@ -1402,6 +1622,74 @@
 							"path": [
 								"api",
 								"transaksi"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Transaksi with Date Range & Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transaksi?page=1&limit=20&search=TRX&tanggalTransaksiStart=2025-01-01&tanggalTransaksiEnd=2025-12-31&customerId=1&metodePembayaran=cash&status=selesai&sortBy=tanggalTransaksi&sortOrder=DESC",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transaksi"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "search",
+									"value": "TRX",
+									"description": "Search in: noFaktur, keterangan"
+								},
+								{
+									"key": "tanggalTransaksiStart",
+									"value": "2025-01-01",
+									"description": "Start date"
+								},
+								{
+									"key": "tanggalTransaksiEnd",
+									"value": "2025-12-31",
+									"description": "End date"
+								},
+								{
+									"key": "customerId",
+									"value": "1",
+									"description": "Filter by customer"
+								},
+								{
+									"key": "metodePembayaran",
+									"value": "cash",
+									"description": "cash, transfer, etc"
+								},
+								{
+									"key": "status",
+									"value": "selesai",
+									"description": "Filter by status"
+								},
+								{
+									"key": "sortBy",
+									"value": "tanggalTransaksi",
+									"description": "Default: tanggalTransaksi"
+								},
+								{
+									"key": "sortOrder",
+									"value": "DESC",
+									"description": "Default: DESC"
+								}
 							]
 						}
 					},

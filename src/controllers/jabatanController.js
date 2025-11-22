@@ -1,15 +1,23 @@
 const { Jabatan } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all jabatan
+// Get all jabatan with pagination, search, and filters
 const getAllJabatan = async (req, res) => {
   try {
-    const jabatan = await Jabatan.findAll({
-      order: [['id', 'ASC']],
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['kode', 'nama', 'deskripsi'],
+      allowedFilters: ['isActive'],
+      defaultSort: 'id',
     });
-    res.json({
-      success: true,
-      data: jabatan,
+
+    const { count, rows } = await Jabatan.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
     });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting jabatan:', error);
     res.status(500).json({

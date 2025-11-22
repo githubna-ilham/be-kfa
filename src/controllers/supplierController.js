@@ -1,15 +1,23 @@
 const { Supplier } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all supplier
+// Get all supplier with pagination, search, and filters
 const getAllSupplier = async (req, res) => {
   try {
-    const supplier = await Supplier.findAll({
-      order: [['id', 'ASC']],
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['kode', 'nama', 'email', 'noTelp', 'alamat', 'kota', 'kontak'],
+      allowedFilters: ['isActive', 'kota'],
+      defaultSort: 'id',
     });
-    res.json({
-      success: true,
-      data: supplier,
+
+    const { count, rows } = await Supplier.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
     });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting supplier:', error);
     res.status(500).json({

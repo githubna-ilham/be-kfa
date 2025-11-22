@@ -1,15 +1,23 @@
 const { BentukSediaan } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all bentuk sediaan
+// Get all bentuk sediaan with pagination, search, and filters
 const getAllBentukSediaan = async (req, res) => {
   try {
-    const bentukSediaan = await BentukSediaan.findAll({
-      order: [['id', 'ASC']],
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['kode', 'nama', 'deskripsi'],
+      allowedFilters: ['isActive'],
+      defaultSort: 'id',
     });
-    res.json({
-      success: true,
-      data: bentukSediaan,
+
+    const { count, rows } = await BentukSediaan.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
     });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting bentuk sediaan:', error);
     res.status(500).json({

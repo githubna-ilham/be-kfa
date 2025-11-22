@@ -1,15 +1,23 @@
 const { GolonganObat } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all golongan obat
+// Get all golongan obat with pagination, search, and filters
 const getAllGolonganObat = async (req, res) => {
   try {
-    const golonganObat = await GolonganObat.findAll({
-      order: [['id', 'ASC']],
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['kode', 'nama', 'deskripsi'],
+      allowedFilters: ['isActive'],
+      defaultSort: 'id',
     });
-    res.json({
-      success: true,
-      data: golonganObat,
+
+    const { count, rows } = await GolonganObat.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
     });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting golongan obat:', error);
     res.status(500).json({

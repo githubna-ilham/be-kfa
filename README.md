@@ -23,6 +23,8 @@ Backend API untuk sistem manajemen apotek yang dibangun dengan Node.js, Express,
 - Activity Logging
 - Employee Management
 - Customer Management
+- **Advanced Pagination & Filtering System**
+- **Search & Sorting Capabilities**
 
 ## Instalasi
 
@@ -107,6 +109,86 @@ Jika Anda menjalankan seeders, berikut adalah credentials default:
 | apoteker | password123 | user | apoteker@kfa.com |
 | kasir | password123 | user | kasir@kfa.com |
 | gudang | password123 | user | gudang@kfa.com |
+
+---
+
+# Pagination, Search, Filter & Sorting
+
+Semua endpoint **GET** yang menampilkan list data mendukung fitur pagination, search, filter, dan sorting.
+
+## Query Parameters
+
+### 1. Pagination
+```
+?page=1&limit=20
+```
+- `page` - Nomor halaman (default: 1)
+- `limit` - Jumlah data per halaman (default: 10)
+
+### 2. Search
+```
+?search=keyword
+```
+Mencari data berdasarkan keyword di multiple fields (case-insensitive). Search fields berbeda untuk setiap endpoint.
+
+**Contoh Search Fields:**
+- **Obat**: `kodeObat`, `namaObat`, `deskripsi`
+- **Customer**: `kode`, `nama`, `email`, `noTelp`, `alamat`
+- **Pegawai**: `nip`, `nama`, `email`, `noTelp`
+- **Supplier**: `kode`, `nama`, `email`, `noTelp`
+- **Transaksi**: `noFaktur`, `keterangan`
+
+### 3. Sorting
+```
+?sortBy=nama&sortOrder=ASC
+```
+- `sortBy` - Field yang digunakan untuk sorting (default: `id`)
+- `sortOrder` - Urutan sorting: `ASC` atau `DESC` (default: `ASC`)
+
+### 4. Filtering
+Filter berdasarkan field spesifik. Setiap endpoint memiliki allowed filters yang berbeda.
+
+**Contoh Filters:**
+- **Obat**: `kategoriObatId`, `satuanId`, `golonganObatId`, `bentukSediaanId`, `supplierId`, `isActive`
+- **Customer**: `jenisKelamin`, `isActive`
+- **Pegawai**: `jabatanId`, `unitKerjaId`, `status`, `jenisKelamin`
+- **Transaksi**: `customerId`, `pegawaiId`, `status`, `metodePembayaran`
+
+```
+?kategoriObatId=1&isActive=true
+```
+
+### 5. Date Range Filtering
+Untuk endpoint dengan data tanggal (seperti Transaksi):
+```
+?tanggalTransaksiStart=2024-01-01&tanggalTransaksiEnd=2024-12-31
+```
+
+### Kombinasi Query Parameters
+
+Semua parameter dapat dikombinasikan:
+```
+GET /api/obat?page=1&limit=20&search=paracetamol&kategoriObatId=3&isActive=true&sortBy=namaObat&sortOrder=ASC
+```
+
+## Response Format
+
+Semua endpoint GET list akan mengembalikan response dengan format:
+
+```json
+{
+  "success": true,
+  "data": [...],
+  "pagination": {
+    "total": 150,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 8,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  }
+}
+```
 
 ---
 
@@ -237,19 +319,43 @@ Authorization: Bearer <token>
 
 **Endpoint:** `GET /api/kategori-obat`
 
+**Query Parameters (Optional):**
+- `page` - Nomor halaman (default: 1)
+- `limit` - Data per halaman (default: 10)
+- `search` - Pencarian di field: `kode`, `nama`
+- `sortBy` - Field untuk sorting (default: `id`)
+- `sortOrder` - ASC atau DESC (default: `ASC`)
+- `isActive` - Filter berdasarkan status (true/false)
+
+**Example:**
+```
+GET /api/kategori-obat?page=1&limit=10&search=obat&sortBy=nama&sortOrder=ASC&isActive=true
+```
+
 **Response (200):**
 ```json
-[
-  {
-    "id": 1,
-    "kode": "OBT-KRS",
-    "nama": "Obat Keras",
-    "deskripsi": "Obat yang hanya dapat diperoleh dengan resep dokter",
-    "isActive": true,
-    "createdAt": "2025-11-22T05:43:42.000Z",
-    "updatedAt": "2025-11-22T05:43:42.000Z"
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "kode": "OBT-KRS",
+      "nama": "Obat Keras",
+      "deskripsi": "Obat yang hanya dapat diperoleh dengan resep dokter",
+      "isActive": true,
+      "createdAt": "2025-11-22T05:43:42.000Z",
+      "updatedAt": "2025-11-22T05:43:42.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 7,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
   }
-]
+}
 ```
 
 ### 2. Get Kategori Obat by ID
@@ -336,8 +442,19 @@ Authorization: Bearer <token>
 
 ## Satuan
 
-Endpoint yang sama seperti Kategori Obat:
-- `GET /api/satuan` - Get all
+### 1. Get All Satuan
+
+**Endpoint:** `GET /api/satuan`
+
+**Query Parameters (Optional):**
+- `page`, `limit` - Pagination
+- `search` - Pencarian di field: `kode`, `nama`
+- `sortBy`, `sortOrder` - Sorting
+- `isActive` - Filter status
+
+**Response sama seperti Kategori Obat (dengan pagination)**
+
+### 2-5. Other Endpoints
 - `GET /api/satuan/:id` - Get by ID
 - `POST /api/satuan` - Create
 - `PUT /api/satuan/:id` - Update
@@ -362,23 +479,45 @@ Endpoint yang sama seperti Kategori Obat:
 
 **Endpoint:** `GET /api/supplier`
 
+**Query Parameters (Optional):**
+- `page`, `limit` - Pagination
+- `search` - Pencarian di field: `kode`, `nama`, `email`, `noTelp`
+- `sortBy`, `sortOrder` - Sorting
+- `isActive` - Filter status
+
+**Example:**
+```
+GET /api/supplier?page=1&limit=10&search=kimia&isActive=true
+```
+
 **Response (200):**
 ```json
-[
-  {
-    "id": 1,
-    "kode": "SUP001",
-    "nama": "PT Kimia Farma Trading",
-    "alamat": "Jl. Veteran No. 9, Jakarta Pusat",
-    "kota": "Jakarta",
-    "noTelp": "021-3841031",
-    "email": "trading@kimiafarma.co.id",
-    "kontak": "Divisi Trading",
-    "isActive": true,
-    "createdAt": "2025-11-22T05:43:42.000Z",
-    "updatedAt": "2025-11-22T05:43:42.000Z"
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "kode": "SUP001",
+      "nama": "PT Kimia Farma Trading",
+      "alamat": "Jl. Veteran No. 9, Jakarta Pusat",
+      "kota": "Jakarta",
+      "noTelp": "021-3841031",
+      "email": "trading@kimiafarma.co.id",
+      "kontak": "Divisi Trading",
+      "isActive": true,
+      "createdAt": "2025-11-22T05:43:42.000Z",
+      "updatedAt": "2025-11-22T05:43:42.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 5,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
   }
-]
+}
 ```
 
 ### 2. Create Supplier
@@ -403,89 +542,49 @@ Endpoint yang sama seperti Kategori Obat:
 
 ## Golongan Obat
 
-Endpoint yang sama seperti Kategori Obat:
-- `GET /api/golongan-obat`
+**GET** `/api/golongan-obat` - Mendukung pagination, search (`kode`, `nama`), sorting, dan filter (`isActive`)
+
+Endpoint lainnya:
 - `GET /api/golongan-obat/:id`
 - `POST /api/golongan-obat`
 - `PUT /api/golongan-obat/:id`
 - `DELETE /api/golongan-obat/:id`
 
-**Contoh Data:**
-```json
-{
-  "id": 1,
-  "kode": "ANLG",
-  "nama": "Analgesik",
-  "deskripsi": "Obat pereda nyeri",
-  "isActive": true
-}
-```
-
 ---
 
 ## Bentuk Sediaan
 
-Endpoint yang sama seperti Kategori Obat:
-- `GET /api/bentuk-sediaan`
+**GET** `/api/bentuk-sediaan` - Mendukung pagination, search (`kode`, `nama`), sorting, dan filter (`isActive`)
+
+Endpoint lainnya:
 - `GET /api/bentuk-sediaan/:id`
 - `POST /api/bentuk-sediaan`
 - `PUT /api/bentuk-sediaan/:id`
 - `DELETE /api/bentuk-sediaan/:id`
 
-**Contoh Data:**
-```json
-{
-  "id": 1,
-  "kode": "TBL",
-  "nama": "Tablet",
-  "deskripsi": "Sediaan padat berbentuk tablet",
-  "isActive": true
-}
-```
-
 ---
 
 ## Jabatan
 
-Endpoint yang sama seperti Kategori Obat:
-- `GET /api/jabatan`
+**GET** `/api/jabatan` - Mendukung pagination, search (`kode`, `nama`), sorting, dan filter (`isActive`)
+
+Endpoint lainnya:
 - `GET /api/jabatan/:id`
 - `POST /api/jabatan`
 - `PUT /api/jabatan/:id`
 - `DELETE /api/jabatan/:id`
 
-**Contoh Data:**
-```json
-{
-  "id": 1,
-  "kode": "DIR",
-  "nama": "Direktur",
-  "deskripsi": "Direktur Apotek",
-  "isActive": true
-}
-```
-
 ---
 
 ## Unit Kerja
 
-Endpoint yang sama seperti Kategori Obat:
-- `GET /api/unit-kerja`
+**GET** `/api/unit-kerja` - Mendukung pagination, search (`kode`, `nama`), sorting, dan filter (`isActive`)
+
+Endpoint lainnya:
 - `GET /api/unit-kerja/:id`
 - `POST /api/unit-kerja`
 - `PUT /api/unit-kerja/:id`
 - `DELETE /api/unit-kerja/:id`
-
-**Contoh Data:**
-```json
-{
-  "id": 1,
-  "kode": "MNG",
-  "nama": "Manajemen",
-  "deskripsi": "Unit manajemen dan administrasi",
-  "isActive": true
-}
-```
 
 ---
 
@@ -495,41 +594,68 @@ Endpoint yang sama seperti Kategori Obat:
 
 **Endpoint:** `GET /api/pegawai`
 
+**Query Parameters (Optional):**
+- `page`, `limit` - Pagination
+- `search` - Pencarian di field: `nip`, `nama`, `email`, `noTelp`
+- `sortBy`, `sortOrder` - Sorting
+- `jabatanId` - Filter berdasarkan jabatan
+- `unitKerjaId` - Filter berdasarkan unit kerja
+- `status` - Filter status (aktif/non-aktif)
+- `jenisKelamin` - Filter jenis kelamin (L/P)
+
+**Example:**
+```
+GET /api/pegawai?page=1&limit=10&search=admin&jabatanId=1&status=aktif
+```
+
 **Response (200):**
 ```json
-[
-  {
-    "id": 1,
-    "userId": 1,
-    "nip": "2024001",
-    "nama": "Administrator",
-    "jenisKelamin": "L",
-    "tempatLahir": "Jakarta",
-    "tanggalLahir": "1985-05-15",
-    "alamat": "Jl. Merdeka No. 123, Jakarta",
-    "noTelp": "081234567890",
-    "email": "admin@kfa.com",
-    "jabatanId": 1,
-    "unitKerjaId": 1,
-    "tanggalMasuk": "2020-01-01",
-    "status": "aktif",
-    "user": {
+{
+  "success": true,
+  "data": [
+    {
       "id": 1,
-      "username": "admin",
+      "userId": 1,
+      "nip": "2024001",
+      "nama": "Administrator",
+      "jenisKelamin": "L",
+      "tempatLahir": "Jakarta",
+      "tanggalLahir": "1985-05-15",
+      "alamat": "Jl. Merdeka No. 123, Jakarta",
+      "noTelp": "081234567890",
       "email": "admin@kfa.com",
-      "role": "admin",
-      "isActive": true
-    },
-    "jabatan": {
-      "id": 1,
-      "nama": "Direktur"
-    },
-    "unitKerja": {
-      "id": 1,
-      "nama": "Manajemen"
+      "jabatanId": 1,
+      "unitKerjaId": 1,
+      "tanggalMasuk": "2020-01-01",
+      "status": "aktif",
+      "user": {
+        "id": 1,
+        "username": "admin",
+        "email": "admin@kfa.com",
+        "role": "admin",
+        "isActive": true
+      },
+      "jabatan": {
+        "id": 1,
+        "kode": "DIR",
+        "nama": "Direktur"
+      },
+      "unitKerja": {
+        "id": 1,
+        "kode": "MNG",
+        "nama": "Manajemen"
+      }
     }
+  ],
+  "pagination": {
+    "total": 5,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
   }
-]
+}
 ```
 
 ### 2. Get Pegawai by ID
@@ -584,23 +710,46 @@ Endpoint yang sama seperti Kategori Obat:
 
 **Endpoint:** `GET /api/customer`
 
+**Query Parameters (Optional):**
+- `page`, `limit` - Pagination
+- `search` - Pencarian di field: `kode`, `nama`, `email`, `noTelp`, `alamat`
+- `sortBy`, `sortOrder` - Sorting
+- `jenisKelamin` - Filter jenis kelamin (L/P)
+- `isActive` - Filter status
+
+**Example:**
+```
+GET /api/customer?page=1&limit=20&search=budi&jenisKelamin=L&isActive=true
+```
+
 **Response (200):**
 ```json
-[
-  {
-    "id": 1,
-    "kode": "CUST001",
-    "nama": "Budi Santoso",
-    "noTelp": "081234567001",
-    "alamat": "Jl. Raya Bogor No. 123, Jakarta",
-    "email": "budi.santoso@email.com",
-    "tanggalLahir": "1980-01-15",
-    "jenisKelamin": "L",
-    "isActive": true,
-    "createdAt": "2025-11-22T05:43:42.000Z",
-    "updatedAt": "2025-11-22T05:43:42.000Z"
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "kode": "CUST001",
+      "nama": "Budi Santoso",
+      "noTelp": "081234567001",
+      "alamat": "Jl. Raya Bogor No. 123, Jakarta",
+      "email": "budi.santoso@email.com",
+      "tanggalLahir": "1980-01-15",
+      "jenisKelamin": "L",
+      "isActive": true,
+      "createdAt": "2025-11-22T05:43:42.000Z",
+      "updatedAt": "2025-11-22T05:43:42.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 10,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
   }
-]
+}
 ```
 
 ### 2. Create Customer
@@ -637,45 +786,75 @@ Endpoint yang sama seperti Kategori Obat:
 
 **Endpoint:** `GET /api/obat`
 
+**Query Parameters (Optional):**
+- `page`, `limit` - Pagination
+- `search` - Pencarian di field: `kodeObat`, `namaObat`, `deskripsi`
+- `sortBy`, `sortOrder` - Sorting
+- `kategoriObatId` - Filter berdasarkan kategori obat
+- `satuanId` - Filter berdasarkan satuan
+- `golonganObatId` - Filter berdasarkan golongan obat
+- `bentukSediaanId` - Filter berdasarkan bentuk sediaan
+- `supplierId` - Filter berdasarkan supplier
+- `isActive` - Filter status
+
+**Example:**
+```
+GET /api/obat?page=1&limit=20&search=paracetamol&kategoriObatId=3&isActive=true&sortBy=namaObat
+```
+
 **Response (200):**
 ```json
-[
-  {
-    "id": 1,
-    "kodeObat": "OBT001",
-    "namaObat": "Paracetamol 500mg",
-    "kategoriObatId": 3,
-    "satuanId": 1,
-    "golonganObatId": 2,
-    "bentukSediaanId": 1,
-    "supplierId": null,
-    "stok": 100,
-    "stokMinimal": 20,
-    "hargaBeli": "5000.00",
-    "hargaJual": "7500.00",
-    "tanggalKadaluarsa": "2026-12-31",
-    "noBatch": null,
-    "deskripsi": "Obat penurun panas dan pereda nyeri",
-    "isActive": true,
-    "kategoriObat": {
-      "id": 3,
-      "nama": "Obat Bebas"
-    },
-    "satuan": {
+{
+  "success": true,
+  "data": [
+    {
       "id": 1,
-      "nama": "Strip"
-    },
-    "golonganObat": {
-      "id": 2,
-      "nama": "Antipiretik"
-    },
-    "bentukSediaan": {
-      "id": 1,
-      "nama": "Tablet"
-    },
-    "supplier": null
+      "kodeObat": "OBT001",
+      "namaObat": "Paracetamol 500mg",
+      "kategoriObatId": 3,
+      "satuanId": 1,
+      "golonganObatId": 2,
+      "bentukSediaanId": 1,
+      "supplierId": null,
+      "stok": 100,
+      "stokMinimal": 20,
+      "hargaBeli": "5000.00",
+      "hargaJual": "7500.00",
+      "tanggalKadaluarsa": "2026-12-31",
+      "noBatch": null,
+      "deskripsi": "Obat penurun panas dan pereda nyeri",
+      "isActive": true,
+      "kategoriObat": {
+        "id": 3,
+        "kode": "OBT-BBS",
+        "nama": "Obat Bebas"
+      },
+      "satuan": {
+        "id": 1,
+        "kode": "STRIP",
+        "nama": "Strip"
+      },
+      "golonganObat": {
+        "id": 2,
+        "kode": "ANTP",
+        "nama": "Antipiretik"
+      },
+      "bentukSediaan": {
+        "id": 1,
+        "kode": "TBL",
+        "nama": "Tablet"
+      }
+    }
+  ],
+  "pagination": {
+    "total": 10,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
   }
-]
+}
 ```
 
 ### 2. Get Obat by ID
@@ -732,46 +911,76 @@ Endpoint yang sama seperti Kategori Obat:
 
 **Endpoint:** `GET /api/transaksi`
 
+**Query Parameters (Optional):**
+- `page`, `limit` - Pagination
+- `search` - Pencarian di field: `noFaktur`, `keterangan`
+- `sortBy`, `sortOrder` - Sorting (default: `tanggalTransaksi DESC`)
+- `customerId` - Filter berdasarkan customer
+- `pegawaiId` - Filter berdasarkan pegawai/user
+- `status` - Filter status transaksi
+- `metodePembayaran` - Filter metode pembayaran (cash/transfer/etc)
+- `tanggalTransaksiStart` - Tanggal mulai
+- `tanggalTransaksiEnd` - Tanggal akhir
+
+**Example:**
+```
+GET /api/transaksi?page=1&limit=20&tanggalTransaksiStart=2025-01-01&tanggalTransaksiEnd=2025-12-31&metodePembayaran=cash
+```
+
 **Response (200):**
 ```json
-[
-  {
-    "id": 1,
-    "nomorTransaksi": "TRX-20251122-001",
-    "tanggalTransaksi": "2025-11-22",
-    "customerId": 1,
-    "userId": 4,
-    "totalHarga": "75000.00",
-    "diskon": "0.00",
-    "pajak": "7500.00",
-    "totalBayar": "82500.00",
-    "metodePembayaran": "cash",
-    "statusTransaksi": "selesai",
-    "keterangan": null,
-    "customer": {
+{
+  "success": true,
+  "data": [
+    {
       "id": 1,
-      "nama": "Budi Santoso"
-    },
-    "user": {
-      "id": 4,
-      "username": "kasir",
-      "fullName": "Kasir Apotek"
-    },
-    "detailTransaksi": [
-      {
+      "nomorTransaksi": "TRX-20251122-001",
+      "tanggalTransaksi": "2025-11-22",
+      "customerId": 1,
+      "userId": 4,
+      "totalHarga": "75000.00",
+      "diskon": "0.00",
+      "pajak": "7500.00",
+      "totalBayar": "82500.00",
+      "metodePembayaran": "cash",
+      "statusTransaksi": "selesai",
+      "keterangan": null,
+      "customer": {
         "id": 1,
-        "obatId": 1,
-        "jumlah": 10,
-        "hargaSatuan": "7500.00",
-        "subtotal": "75000.00",
-        "obat": {
+        "kode": "CUST001",
+        "nama": "Budi Santoso",
+        "noTelp": "081234567001"
+      },
+      "user": {
+        "id": 4,
+        "username": "kasir",
+        "email": "kasir@kfa.com"
+      },
+      "detailTransaksi": [
+        {
           "id": 1,
-          "namaObat": "Paracetamol 500mg"
+          "obatId": 1,
+          "jumlah": 10,
+          "hargaSatuan": "7500.00",
+          "subtotal": "75000.00",
+          "obat": {
+            "id": 1,
+            "kodeObat": "OBT001",
+            "namaObat": "Paracetamol 500mg"
+          }
         }
-      }
-    ]
+      ]
+    }
+  ],
+  "pagination": {
+    "total": 50,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 3,
+    "hasNextPage": true,
+    "hasPrevPage": false
   }
-]
+}
 ```
 
 ### 2. Get Transaksi by ID

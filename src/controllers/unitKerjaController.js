@@ -1,15 +1,23 @@
 const { UnitKerja } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all unit kerja
+// Get all unit kerja with pagination, search, and filters
 const getAllUnitKerja = async (req, res) => {
   try {
-    const unitKerja = await UnitKerja.findAll({
-      order: [['id', 'ASC']],
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['kode', 'nama', 'deskripsi'],
+      allowedFilters: ['isActive'],
+      defaultSort: 'id',
     });
-    res.json({
-      success: true,
-      data: unitKerja,
+
+    const { count, rows } = await UnitKerja.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
     });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting unit kerja:', error);
     res.status(500).json({

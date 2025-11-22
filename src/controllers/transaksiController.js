@@ -1,10 +1,27 @@
 const { Transaksi, DetailTransaksi, Customer, Obat, User } = require('../models');
 const { sequelize } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all transaksi
+// Get all transaksi with pagination, search, and filters
 const getAllTransaksi = async (req, res) => {
   try {
-    const transaksi = await Transaksi.findAll({
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['noFaktur', 'keterangan'],
+      allowedFilters: ['customerId', 'pegawaiId', 'status', 'metodePembayaran'],
+      defaultSort: 'tanggalTransaksi',
+      dateFields: ['tanggalTransaksi'],
+    });
+
+    // Override default sort to DESC for transaksi
+    if (!req.query.sortOrder) {
+      queryOptions.order = [['tanggalTransaksi', 'DESC']];
+    }
+
+    const { count, rows } = await Transaksi.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
       include: [
         {
           model: Customer,
@@ -28,12 +45,9 @@ const getAllTransaksi = async (req, res) => {
           ],
         },
       ],
-      order: [['tanggal_transaksi', 'DESC']],
     });
-    res.json({
-      success: true,
-      data: transaksi,
-    });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting transaksi:', error);
     res.status(500).json({

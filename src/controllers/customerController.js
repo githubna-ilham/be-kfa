@@ -1,15 +1,23 @@
 const { Customer } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all customer
+// Get all customer with pagination, search, and filters
 const getAllCustomer = async (req, res) => {
   try {
-    const customer = await Customer.findAll({
-      order: [['id', 'ASC']],
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['kode', 'nama', 'email', 'noTelp', 'alamat'],
+      allowedFilters: ['jenisKelamin', 'isActive'],
+      defaultSort: 'id',
     });
-    res.json({
-      success: true,
-      data: customer,
+
+    const { count, rows } = await Customer.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
     });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting customer:', error);
     res.status(500).json({

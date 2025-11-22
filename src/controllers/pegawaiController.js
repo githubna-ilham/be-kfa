@@ -1,9 +1,20 @@
 const { Pegawai, Jabatan, UnitKerja, User } = require('../models');
+const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
-// Get all pegawai
+// Get all pegawai with pagination, search, and filters
 const getAllPegawai = async (req, res) => {
   try {
-    const pegawai = await Pegawai.findAll({
+    const queryOptions = buildQueryOptions(req, {
+      searchFields: ['nip', 'nama', 'email', 'noTelp'],
+      allowedFilters: ['jabatanId', 'unitKerjaId', 'status', 'jenisKelamin'],
+      defaultSort: 'id',
+    });
+
+    const { count, rows } = await Pegawai.findAndCountAll({
+      where: queryOptions.where,
+      limit: queryOptions.limit,
+      offset: queryOptions.offset,
+      order: queryOptions.order,
       include: [
         {
           model: User,
@@ -21,12 +32,9 @@ const getAllPegawai = async (req, res) => {
           attributes: ['id', 'kode', 'nama'],
         },
       ],
-      order: [['id', 'ASC']],
     });
-    res.json({
-      success: true,
-      data: pegawai,
-    });
+
+    res.json(formatPaginatedResponse(rows, count, queryOptions.page, queryOptions.limit));
   } catch (error) {
     console.error('Error getting pegawai:', error);
     res.status(500).json({
