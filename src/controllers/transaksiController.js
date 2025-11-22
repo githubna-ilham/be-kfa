@@ -133,21 +133,52 @@ const createTransaksi = async (req, res) => {
       customerId,
       pegawaiId,
       tanggalTransaksi,
-      totalHarga,
       diskon,
-      grandTotal,
+      pajak,
       metodePembayaran,
       status,
       keterangan,
       details,
+      detailTransaksi, // Support both naming conventions
     } = req.body;
 
-    if (!pegawaiId || !details || details.length === 0) {
+    // Use detailTransaksi if details is not provided (backward compatibility)
+    const transaksiDetails = details || detailTransaksi;
+
+    if (!transaksiDetails || transaksiDetails.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Pegawai ID and detail transaksi are required',
+        message: 'Detail transaksi are required',
       });
     }
+
+    // Get pegawaiId from logged-in user's pegawai data if not provided
+    let finalPegawaiId = pegawaiId;
+    if (!finalPegawaiId) {
+      const pegawai = await Pegawai.findOne({
+        where: { userId: req.user.id },
+      });
+
+      if (!pegawai) {
+        return res.status(400).json({
+          success: false,
+          message: 'Pegawai data not found for current user. Please provide pegawaiId.',
+        });
+      }
+      finalPegawaiId = pegawai.id;
+    }
+
+    // Calculate totalHarga from details
+    let calculatedTotalHarga = 0;
+    for (const detail of transaksiDetails) {
+      const subtotal = detail.subtotal || (detail.hargaSatuan * detail.jumlah);
+      calculatedTotalHarga += subtotal;
+    }
+
+    // Calculate grandTotal (totalHarga - diskon + pajak)
+    const finalDiskon = diskon || 0;
+    const finalPajak = pajak || 0;
+    const calculatedGrandTotal = calculatedTotalHarga - finalDiskon + finalPajak;
 
     // Generate noFaktur if not provided
     const generatedNoFaktur = noFaktur || `TRX-${Date.now()}`;
@@ -157,11 +188,11 @@ const createTransaksi = async (req, res) => {
       {
         noFaktur: generatedNoFaktur,
         customerId,
-        pegawaiId,
+        pegawaiId: finalPegawaiId,
         tanggalTransaksi: tanggalTransaksi || new Date(),
-        totalHarga: totalHarga || 0,
-        diskon: diskon || 0,
-        grandTotal: grandTotal || 0,
+        totalHarga: calculatedTotalHarga,
+        diskon: finalDiskon,
+        grandTotal: calculatedGrandTotal,
         metodePembayaran: metodePembayaran || 'Cash',
         status: status || 'pending',
         keterangan,
@@ -170,7 +201,7 @@ const createTransaksi = async (req, res) => {
     );
 
     // Create detail transaksi
-    const detailPromises = details.map(async (detail) => {
+    const detailPromises = transaksiDetails.map(async (detail) => {
       // Update stok obat
       const obat = await Obat.findByPk(detail.obatId, { transaction: t });
       if (!obat) {
@@ -186,13 +217,16 @@ const createTransaksi = async (req, res) => {
         { transaction: t }
       );
 
+      // Calculate subtotal if not provided
+      const calculatedSubtotal = detail.subtotal || (detail.hargaSatuan * detail.jumlah);
+
       return DetailTransaksi.create(
         {
           transaksiId: transaksi.id,
           obatId: detail.obatId,
           jumlah: detail.jumlah,
           hargaSatuan: detail.hargaSatuan,
-          subtotal: detail.subtotal,
+          subtotal: calculatedSubtotal,
         },
         { transaction: t }
       );
