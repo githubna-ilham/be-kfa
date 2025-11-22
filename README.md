@@ -158,7 +158,7 @@ Authorization: Bearer <token>
 **Request Body:**
 ```json
 {
-  "username": "admin",
+  "email": "admin@kfa.com",
   "password": "password123"
 }
 ```

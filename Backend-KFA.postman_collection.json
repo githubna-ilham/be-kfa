@@ -1,0 +1,1822 @@
+{
+	"info": {
+		"_postman_id": "backend-kfa-api-collection",
+		"name": "Backend KFA - Pharmacy Management System",
+		"description": "Complete API collection for Backend KFA Pharmacy Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"Test User\",\n  \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"auth_token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@kfa.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"newuser@kfa.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"New User\",\n  \"role\": \"user\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Updated Name\",\n  \"email\": \"updated@kfa.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Kategori Obat",
+			"item": [
+				{
+					"name": "Get All Kategori Obat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/kategori-obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kategori-obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Kategori Obat by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/kategori-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kategori-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Kategori Obat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"OBT-NEW\",\n  \"nama\": \"Kategori Baru\",\n  \"deskripsi\": \"Deskripsi kategori baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/kategori-obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kategori-obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Kategori Obat",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Kategori Updated\",\n  \"deskripsi\": \"Deskripsi yang diupdate\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/kategori-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kategori-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Kategori Obat",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/kategori-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kategori-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Satuan",
+			"item": [
+				{
+					"name": "Get All Satuan",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/satuan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"satuan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Satuan by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/satuan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"satuan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Satuan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"NEW\",\n  \"nama\": \"Satuan Baru\",\n  \"deskripsi\": \"Deskripsi satuan baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/satuan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"satuan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Satuan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Satuan Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/satuan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"satuan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Satuan",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/satuan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"satuan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Supplier",
+			"item": [
+				{
+					"name": "Get All Supplier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/supplier",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"supplier"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Supplier by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/supplier/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"supplier",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Supplier",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"SUP006\",\n  \"nama\": \"PT Pharma Baru\",\n  \"alamat\": \"Jl. Sudirman No. 123\",\n  \"kota\": \"Jakarta\",\n  \"noTelp\": \"021-1234567\",\n  \"email\": \"info@pharmabaru.com\",\n  \"kontak\": \"Sales Department\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/supplier",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"supplier"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Supplier",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"PT Pharma Updated\",\n  \"noTelp\": \"021-9999999\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/supplier/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"supplier",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Supplier",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/supplier/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"supplier",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Golongan Obat",
+			"item": [
+				{
+					"name": "Get All Golongan Obat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/golongan-obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"golongan-obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Golongan Obat by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/golongan-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"golongan-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Golongan Obat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"NEW\",\n  \"nama\": \"Golongan Baru\",\n  \"deskripsi\": \"Deskripsi golongan baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/golongan-obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"golongan-obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Golongan Obat",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Golongan Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/golongan-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"golongan-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Golongan Obat",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/golongan-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"golongan-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bentuk Sediaan",
+			"item": [
+				{
+					"name": "Get All Bentuk Sediaan",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bentuk-sediaan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bentuk-sediaan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bentuk Sediaan by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bentuk-sediaan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bentuk-sediaan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bentuk Sediaan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"NEW\",\n  \"nama\": \"Bentuk Baru\",\n  \"deskripsi\": \"Deskripsi bentuk sediaan baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bentuk-sediaan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bentuk-sediaan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bentuk Sediaan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Bentuk Sediaan Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bentuk-sediaan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bentuk-sediaan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Bentuk Sediaan",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bentuk-sediaan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bentuk-sediaan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Jabatan",
+			"item": [
+				{
+					"name": "Get All Jabatan",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/jabatan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"jabatan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Jabatan by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/jabatan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"jabatan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Jabatan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"NEW\",\n  \"nama\": \"Jabatan Baru\",\n  \"deskripsi\": \"Deskripsi jabatan baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/jabatan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"jabatan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Jabatan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Jabatan Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/jabatan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"jabatan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Jabatan",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/jabatan/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"jabatan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Unit Kerja",
+			"item": [
+				{
+					"name": "Get All Unit Kerja",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/unit-kerja",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"unit-kerja"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unit Kerja by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/unit-kerja/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"unit-kerja",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Unit Kerja",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"NEW\",\n  \"nama\": \"Unit Kerja Baru\",\n  \"deskripsi\": \"Deskripsi unit kerja baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/unit-kerja",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"unit-kerja"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Unit Kerja",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Unit Kerja Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/unit-kerja/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"unit-kerja",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Unit Kerja",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/unit-kerja/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"unit-kerja",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pegawai",
+			"item": [
+				{
+					"name": "Get All Pegawai",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pegawai",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pegawai"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pegawai by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pegawai/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pegawai",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Pegawai",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 6,\n  \"nip\": \"2024006\",\n  \"nama\": \"Pegawai Baru\",\n  \"jenisKelamin\": \"L\",\n  \"tempatLahir\": \"Bandung\",\n  \"tanggalLahir\": \"1990-01-01\",\n  \"alamat\": \"Jl. Contoh No. 123\",\n  \"noTelp\": \"081234567890\",\n  \"email\": \"pegawai@kfa.com\",\n  \"jabatanId\": 4,\n  \"unitKerjaId\": 2,\n  \"tanggalMasuk\": \"2025-01-01\",\n  \"status\": \"aktif\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pegawai",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pegawai"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pegawai",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Nama Updated\",\n  \"noTelp\": \"081234567899\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pegawai/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pegawai",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Pegawai",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pegawai/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pegawai",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Get All Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/customer",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/customer/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customer",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kode\": \"CUST011\",\n  \"nama\": \"Customer Baru\",\n  \"noTelp\": \"081234567890\",\n  \"alamat\": \"Jl. Contoh No. 123\",\n  \"email\": \"customer@email.com\",\n  \"tanggalLahir\": \"1990-01-01\",\n  \"jenisKelamin\": \"L\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/customer",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Customer",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nama\": \"Customer Updated\",\n  \"noTelp\": \"081234567899\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/customer/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customer",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/customer/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customer",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Obat",
+			"item": [
+				{
+					"name": "Get All Obat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Obat by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Obat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kodeObat\": \"OBT011\",\n  \"namaObat\": \"Obat Baru 100mg\",\n  \"kategoriObatId\": 3,\n  \"satuanId\": 1,\n  \"golonganObatId\": 2,\n  \"bentukSediaanId\": 1,\n  \"supplierId\": 1,\n  \"stok\": 50,\n  \"stokMinimal\": 10,\n  \"hargaBeli\": 10000,\n  \"hargaJual\": 15000,\n  \"tanggalKadaluarsa\": \"2026-12-31\",\n  \"noBatch\": \"BATCH001\",\n  \"deskripsi\": \"Deskripsi obat baru\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Obat",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namaObat\": \"Obat Updated 100mg\",\n  \"hargaJual\": 16000,\n  \"stok\": 60\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Obat",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transaksi",
+			"item": [
+				{
+					"name": "Get All Transaksi",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transaksi",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transaksi"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaksi by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transaksi/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transaksi",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaksi",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": 1,\n  \"tanggalTransaksi\": \"2025-11-22\",\n  \"metodePembayaran\": \"cash\",\n  \"diskon\": 0,\n  \"pajak\": 7500,\n  \"keterangan\": \"Transaksi kasir\",\n  \"detailTransaksi\": [\n    {\n      \"obatId\": 1,\n      \"jumlah\": 10,\n      \"hargaSatuan\": 7500\n    },\n    {\n      \"obatId\": 2,\n      \"jumlah\": 5,\n      \"hargaSatuan\": 22000\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transaksi",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transaksi"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaksi",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"statusTransaksi\": \"dibatalkan\",\n  \"keterangan\": \"Dibatalkan oleh customer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transaksi/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transaksi",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Transaksi",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transaksi/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transaksi",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pembelian Obat",
+			"item": [
+				{
+					"name": "Get All Pembelian",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pembelian-obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pembelian-obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pembelian by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pembelian-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pembelian-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Pembelian",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplierId\": 1,\n  \"tanggalPembelian\": \"2025-11-22\",\n  \"keterangan\": \"Pembelian stok obat\",\n  \"detailPembelian\": [\n    {\n      \"obatId\": 1,\n      \"jumlah\": 50,\n      \"hargaBeli\": 5000\n    },\n    {\n      \"obatId\": 2,\n      \"jumlah\": 30,\n      \"hargaBeli\": 15000\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pembelian-obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pembelian-obat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pembelian",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"statusPembelian\": \"dibatalkan\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pembelian-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pembelian-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Pembelian",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pembelian-obat/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pembelian-obat",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Riwayat Stok",
+			"item": [
+				{
+					"name": "Get All Riwayat Stok",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/riwayat-stok",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"riwayat-stok"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Riwayat Stok by Obat ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/riwayat-stok?obatId=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"riwayat-stok"
+							],
+							"query": [
+								{
+									"key": "obatId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Riwayat Stok with Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/riwayat-stok?jenisTransaksi=keluar&tanggalDari=2025-01-01&tanggalSampai=2025-12-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"riwayat-stok"
+							],
+							"query": [
+								{
+									"key": "jenisTransaksi",
+									"value": "keluar"
+								},
+								{
+									"key": "tanggalDari",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "tanggalSampai",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Activity Logs",
+			"item": [
+				{
+					"name": "Get All Activity Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activity-logs?page=1&limit=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-logs"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Activity Logs with Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activity-logs?user_id=1&method=POST&endpoint=/api/obat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-logs"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "1"
+								},
+								{
+									"key": "method",
+									"value": "POST"
+								},
+								{
+									"key": "endpoint",
+									"value": "/api/obat"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Activity Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activity-logs/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-logs",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cleanup Old Logs",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/activity-logs/cleanup?days=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"activity-logs",
+								"cleanup"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "30"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
