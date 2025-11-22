@@ -1,4 +1,4 @@
-const { Transaksi, DetailTransaksi, Customer, Obat, User } = require('../models');
+const { Transaksi, DetailTransaksi, Customer, Obat, Pegawai, User } = require('../models');
 const { sequelize } = require('../models');
 const { buildQueryOptions, formatPaginatedResponse } = require('../utils/pagination');
 
@@ -29,13 +29,20 @@ const getAllTransaksi = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailTransaksi,
-          as: 'detailTransaksi',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -70,13 +77,20 @@ const getTransaksiById = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp', 'alamat'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email', 'noTelp'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailTransaksi,
-          as: 'detailTransaksi',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -115,57 +129,56 @@ const createTransaksi = async (req, res) => {
 
   try {
     const {
-      customer_id,
-      user_id,
-      tanggal_transaksi,
-      total_harga,
+      noFaktur,
+      customerId,
+      pegawaiId,
+      tanggalTransaksi,
+      totalHarga,
       diskon,
-      pajak,
-      total_bayar,
-      uang_bayar,
-      uang_kembali,
-      status_pembayaran,
-      metode_pembayaran,
-      catatan,
-      detail_transaksi,
+      grandTotal,
+      metodePembayaran,
+      status,
+      keterangan,
+      details,
     } = req.body;
 
-    if (!user_id || !detail_transaksi || detail_transaksi.length === 0) {
+    if (!pegawaiId || !details || details.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'User ID and detail transaksi are required',
+        message: 'Pegawai ID and detail transaksi are required',
       });
     }
+
+    // Generate noFaktur if not provided
+    const generatedNoFaktur = noFaktur || `TRX-${Date.now()}`;
 
     // Create transaksi
     const transaksi = await Transaksi.create(
       {
-        customer_id,
-        user_id,
-        tanggal_transaksi: tanggal_transaksi || new Date(),
-        total_harga: total_harga || 0,
+        noFaktur: generatedNoFaktur,
+        customerId,
+        pegawaiId,
+        tanggalTransaksi: tanggalTransaksi || new Date(),
+        totalHarga: totalHarga || 0,
         diskon: diskon || 0,
-        pajak: pajak || 0,
-        total_bayar: total_bayar || 0,
-        uang_bayar: uang_bayar || 0,
-        uang_kembali: uang_kembali || 0,
-        status_pembayaran: status_pembayaran || 'lunas',
-        metode_pembayaran,
-        catatan,
+        grandTotal: grandTotal || 0,
+        metodePembayaran: metodePembayaran || 'Cash',
+        status: status || 'pending',
+        keterangan,
       },
       { transaction: t }
     );
 
     // Create detail transaksi
-    const detailPromises = detail_transaksi.map(async (detail) => {
+    const detailPromises = details.map(async (detail) => {
       // Update stok obat
-      const obat = await Obat.findByPk(detail.obat_id, { transaction: t });
+      const obat = await Obat.findByPk(detail.obatId, { transaction: t });
       if (!obat) {
-        throw new Error(`Obat with ID ${detail.obat_id} not found`);
+        throw new Error(`Obat with ID ${detail.obatId} not found`);
       }
 
       if (obat.stok < detail.jumlah) {
-        throw new Error(`Stok ${obat.nama_obat} tidak mencukupi`);
+        throw new Error(`Stok ${obat.namaObat} tidak mencukupi`);
       }
 
       await obat.update(
@@ -175,12 +188,11 @@ const createTransaksi = async (req, res) => {
 
       return DetailTransaksi.create(
         {
-          transaksi_id: transaksi.id,
-          obat_id: detail.obat_id,
+          transaksiId: transaksi.id,
+          obatId: detail.obatId,
           jumlah: detail.jumlah,
-          harga_satuan: detail.harga_satuan,
+          hargaSatuan: detail.hargaSatuan,
           subtotal: detail.subtotal,
-          diskon_item: detail.diskon_item || 0,
         },
         { transaction: t }
       );
@@ -199,13 +211,20 @@ const createTransaksi = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailTransaksi,
-          as: 'detailTransaksi',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -238,10 +257,10 @@ const updateTransaksi = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      customer_id,
-      status_pembayaran,
-      metode_pembayaran,
-      catatan,
+      customerId,
+      status,
+      metodePembayaran,
+      keterangan,
     } = req.body;
 
     const transaksi = await Transaksi.findByPk(id);
@@ -254,10 +273,10 @@ const updateTransaksi = async (req, res) => {
     }
 
     await transaksi.update({
-      customer_id: customer_id !== undefined ? customer_id : transaksi.customer_id,
-      status_pembayaran: status_pembayaran || transaksi.status_pembayaran,
-      metode_pembayaran: metode_pembayaran !== undefined ? metode_pembayaran : transaksi.metode_pembayaran,
-      catatan: catatan !== undefined ? catatan : transaksi.catatan,
+      customerId: customerId !== undefined ? customerId : transaksi.customerId,
+      status: status || transaksi.status,
+      metodePembayaran: metodePembayaran !== undefined ? metodePembayaran : transaksi.metodePembayaran,
+      keterangan: keterangan !== undefined ? keterangan : transaksi.keterangan,
     });
 
     const transaksiWithRelations = await Transaksi.findByPk(id, {
@@ -268,13 +287,20 @@ const updateTransaksi = async (req, res) => {
           attributes: ['id', 'kode', 'nama', 'noTelp'],
         },
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'username', 'email'],
+          model: Pegawai,
+          as: 'pegawai',
+          attributes: ['id', 'nip', 'nama', 'email'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email', 'role'],
+            },
+          ],
         },
         {
           model: DetailTransaksi,
-          as: 'detailTransaksi',
+          as: 'details',
           include: [
             {
               model: Obat,
@@ -312,7 +338,7 @@ const deleteTransaksi = async (req, res) => {
       include: [
         {
           model: DetailTransaksi,
-          as: 'detailTransaksi',
+          as: 'details',
         },
       ],
       transaction: t,
@@ -327,8 +353,8 @@ const deleteTransaksi = async (req, res) => {
     }
 
     // Restore stok
-    for (const detail of transaksi.detailTransaksi) {
-      const obat = await Obat.findByPk(detail.obat_id, { transaction: t });
+    for (const detail of transaksi.details) {
+      const obat = await Obat.findByPk(detail.obatId, { transaction: t });
       if (obat) {
         await obat.update(
           { stok: obat.stok + detail.jumlah },
@@ -339,7 +365,7 @@ const deleteTransaksi = async (req, res) => {
 
     // Delete detail first
     await DetailTransaksi.destroy({
-      where: { transaksi_id: id },
+      where: { transaksiId: id },
       transaction: t,
     });
 
