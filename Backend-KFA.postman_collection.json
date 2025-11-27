@@ -1710,6 +1710,284 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "summary"]
+            },
+            "description": "Get main dashboard summary including total data counts, transaction stats, purchase stats, and stock alerts."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard Summary with Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/summary?startDate=2025-01-01&endDate=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01",
+                  "description": "Start date for filtering transactions (default: start of current month)"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-31",
+                  "description": "End date for filtering transactions (default: today)"
+                }
+              ]
+            },
+            "description": "Get dashboard summary with custom date range for transaction and purchase statistics."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sales Chart - Daily",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/sales-chart?period=daily&days=7",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "sales-chart"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "daily",
+                  "description": "Period type: daily, weekly, monthly"
+                },
+                {
+                  "key": "days",
+                  "value": "7",
+                  "description": "Number of days/weeks to look back"
+                }
+              ]
+            },
+            "description": "Get daily sales chart data for the last 7 days."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sales Chart - Weekly",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/sales-chart?period=weekly&days=4",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "sales-chart"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "weekly",
+                  "description": "Period type: daily, weekly, monthly"
+                },
+                {
+                  "key": "days",
+                  "value": "4",
+                  "description": "Number of weeks to look back"
+                }
+              ]
+            },
+            "description": "Get weekly sales chart data for the last 4 weeks."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sales Chart - Monthly",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/sales-chart?period=monthly",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "sales-chart"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "monthly",
+                  "description": "Period type: daily, weekly, monthly"
+                }
+              ]
+            },
+            "description": "Get monthly sales chart data for the last 12 months."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Top Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/top-products?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "top-products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of top products to return (default: 10)"
+                }
+              ]
+            },
+            "description": "Get top selling products for the current month."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Top Products with Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/top-products?limit=5&startDate=2025-01-01&endDate=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "top-products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": "Number of top products to return"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01",
+                  "description": "Start date for filtering sales"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-31",
+                  "description": "End date for filtering sales"
+                }
+              ]
+            },
+            "description": "Get top selling products with custom date range."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Low Stock Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/low-stock?limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "low-stock"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Number of items to return (default: 20)"
+                }
+              ]
+            },
+            "description": "Get medicines with stock at or below minimum stock level."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Expiring Medicines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/expiring?days=30&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "expiring"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30",
+                  "description": "Number of days to check for expiring medicines (default: 30)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Number of items to return (default: 20)"
+                }
+              ]
+            },
+            "description": "Get medicines that are expired or expiring within specified days."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recent Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/recent-transactions?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "recent-transactions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of recent transactions to return (default: 10)"
+                }
+              ]
+            },
+            "description": "Get the most recent transactions."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment Method Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/payment-stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "payment-stats"]
+            },
+            "description": "Get payment method distribution statistics for the current month."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment Method Stats with Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/payment-stats?startDate=2025-01-01&endDate=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "payment-stats"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01",
+                  "description": "Start date for filtering"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-31",
+                  "description": "End date for filtering"
+                }
+              ]
+            },
+            "description": "Get payment method distribution statistics with custom date range."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [

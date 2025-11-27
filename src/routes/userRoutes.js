@@ -7,18 +7,16 @@ const {
   updateUser,
   deleteUser,
 } = require('../controllers/userController');
-const { authenticate, authorize } = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticate);
 
-// Routes
-router.get('/', getAllUsers); // Semua authenticated user bisa lihat daftar user
-router.get('/:id', getUserById); // Semua authenticated user bisa lihat detail user
-
-// Only admin can create, update, and delete users
-router.post('/', authorize('admin'), createUser);
-router.put('/:id', authorize('admin'), updateUser);
-router.delete('/:id', authorize('admin'), deleteUser);
+// Routes - All authenticated users can access
+router.get('/', getAllUsers);
+router.get('/:id', getUserById);
+router.post('/', createUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
 module.exports = router;

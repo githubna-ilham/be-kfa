@@ -16,6 +16,7 @@ const transaksiRoutes = require('./transaksiRoutes');
 const pembelianObatRoutes = require('./pembelianObatRoutes');
 const riwayatStokRoutes = require('./riwayatStokRoutes');
 const activityLogRoutes = require('./activityLogRoutes');
+const dashboardRoutes = require('./dashboardRoutes');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -54,6 +55,8 @@ router.get('/', (req, res) => {
       riwayatStok: '/api/riwayat-stok',
       // Logs
       activityLogs: '/api/activity-logs',
+      // Dashboard
+      dashboard: '/api/dashboard',
     },
   });
 });
@@ -85,5 +88,8 @@ router.use('/riwayat-stok', riwayatStokRoutes);
 
 // Activity Log routes
 router.use('/activity-logs', activityLogRoutes);
+
+// Dashboard routes
+router.use('/dashboard', dashboardRoutes);
 
 module.exports = router;
